@@ -21,13 +21,11 @@ stages:
     variables:
     - group: Release
     steps:
-
 - task: Maven@3
   displayName: 'Maven pom.xml'
   inputs:
     options: '-DskipITs --settings ./maven/settings.xml'
     publishJUnitResults: false
-
 - task: CopyFiles@2
   displayName: Copy WAR file to staging directory
   inputs:
@@ -36,7 +34,6 @@ stages:
       target/myshuttledev*.war
       *.sql
     targetFolder: '$(build.artifactstagingdirectory)'
-
 - task: Docker@2
   displayName: Build and push Java container image to registry
   inputs:
@@ -47,7 +44,6 @@ stages:
     containerRegistry: 'Container Registry Connection'
     tags: |
       $(tag)
-
 - task: AzureMysqlDeployment@1
   displayName: Run MySQL initialization script
   inputs:
@@ -57,7 +53,6 @@ stages:
     sqlUsername: $(MySqlUserName)@$(MySqlServer)
     sqlPassword: $(MySqlPassword)
     sqlFile: '$(Build.SourcesDirectory)/CreateMYSQLDB.sql'
-
 - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
@@ -73,14 +68,12 @@ stages:
       runOnce:
         deploy:
           steps:
-
 - task: AzureWebAppContainer@1
   displayName: Update the web app with the new container
   inputs:
     appName: $(WebAppName)
     azureSubscription: 'Azure Connection'
     imageName: $(RegistryName)/$(webRepository):$(build.buildId)
-
 - task: AzureAppServiceSettings@1
   displayName: Update web app connection string
   inputs:
